@@ -100,12 +100,12 @@ export function StorePanel() {
   };
 
   return (
-    <div className="space-y-3">
-      <section className="liquid-glass animate-fade-up delay-1 rounded-2xl p-4 text-center">
-        <p className="text-sm">
+    <div className="space-y-2.5">
+      <section className="liquid-glass animate-fade-up delay-1 rounded-3xl p-5 text-center">
+        <p className="text-base tracking-tight">
           {isPremium(state) ? "Premium is active" : "Level up your studio faster"}
         </p>
-        <p className="mt-1 text-[11px] text-foreground/60">Pay with Telegram Stars or GRAM</p>
+        <p className="mt-1 text-[11px] text-foreground/50">Pay with Telegram Stars or GRAM</p>
       </section>
 
       {SHOP_ITEMS.map((item, i) => {
@@ -115,45 +115,55 @@ export function StorePanel() {
         return (
           <div
             key={item.id}
-            className={`liquid-glass animate-fade-up rounded-2xl p-4 ${i < 4 ? `delay-${i + 2}` : ""}`}
+            className={`liquid-glass animate-fade-up overflow-hidden rounded-3xl ${
+              i < 4 ? `delay-${i + 2}` : ""
+            } ${item.highlight ? "ring-1 ring-white/40" : ""}`}
           >
-            <div className="flex items-start gap-3">
+            <div className="flex items-center gap-3 p-4">
               <div
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-                  item.highlight ? "bg-white text-blue-700" : "bg-blue-700"
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${
+                  item.highlight ? "bg-white text-gray-900" : "bg-white/10"
                 }`}
               >
-                <Icon size={20} strokeWidth={2} />
+                <Icon size={20} strokeWidth={1.8} />
               </div>
-              <div className="flex-1">
-                <p className="text-sm">{item.title}</p>
-                <p className="text-[11px] text-foreground/60">{item.desc}</p>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="truncate text-sm">{item.title}</p>
+                  {item.highlight ? (
+                    <span className="shrink-0 rounded-md bg-white px-1.5 py-0.5 text-[10px] text-gray-900">
+                      Best
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mt-0.5 text-[11px] text-foreground/50">{item.desc}</p>
               </div>
             </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
+
+            <div className="grid grid-cols-2 gap-2 border-t border-white/10 p-2.5">
               <button
                 disabled={Boolean(busy)}
                 onClick={() => payWithStars(item)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-white py-2.5 text-xs text-gray-900 transition-transform duration-200 hover:scale-105 active:scale-95 disabled:opacity-50"
+                className="flex items-center justify-center gap-1.5 rounded-2xl bg-white py-3 text-xs text-gray-900 transition-transform duration-200 active:scale-95 disabled:opacity-50"
               >
                 {starsBusy ? (
-                  <Loader2 size={13} className="animate-spin text-blue-700" />
+                  <Loader2 size={14} className="animate-spin text-blue-600" />
                 ) : (
-                  <Star size={13} strokeWidth={2} className="text-blue-700" />
+                  <Star size={14} className="fill-blue-500 text-blue-500" />
                 )}
                 {item.stars} Stars
               </button>
               <button
                 disabled={Boolean(busy)}
                 onClick={() => payWithGram(item)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-blue-700 py-2.5 text-xs transition-transform duration-200 hover:scale-105 active:scale-95 disabled:opacity-50"
+                className="glass-thin flex items-center justify-center gap-1.5 rounded-2xl py-3 text-xs transition-transform duration-200 active:scale-95 disabled:opacity-50"
               >
-                {gramBusy ? <Loader2 size={13} className="animate-spin" /> : <GramIcon size={14} />}
+                {gramBusy ? <Loader2 size={14} className="animate-spin" /> : <GramIcon size={14} />}
                 {item.ton} GRAM
               </button>
             </div>
             {gramBusy && (
-              <p className="mt-2 flex items-center gap-1.5 text-[10px] text-foreground/60">
+              <p className="flex items-center gap-1.5 px-4 pb-3 text-[10px] text-foreground/60">
                 <Check size={11} /> Checking the blockchain for your transfer…
               </p>
             )}
