@@ -100,7 +100,7 @@ function TasksTab() {
                   width={112}
                   height={112}
                   loading="lazy"
-                  className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                  className="h-10 w-10 shrink-0 rounded-lg object-cover"
                 />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm">{t.title}</p>
