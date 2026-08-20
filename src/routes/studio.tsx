@@ -138,168 +138,165 @@ function UpgradesTab() {
     }
   };
 
+  const PayRow = ({
+    kind,
+    id,
+    cost,
+    name,
+    level,
+    label,
+    affordable,
+    onMusic,
+  }: {
+    kind: "instrument" | "miner";
+    id: string;
+    cost: number;
+    name: string;
+    level: number;
+    label: string;
+    affordable: boolean;
+    onMusic: () => void;
+  }) => (
+    <div className="mt-3 flex items-center gap-1.5">
+      <button
+        onClick={onMusic}
+        disabled={!affordable}
+        className={`flex-1 rounded-xl py-2.5 text-xs transition-transform duration-200 active:scale-95 ${
+          affordable ? "bg-white text-gray-900" : "glass-thin text-foreground/40"
+        }`}
+      >
+        {label} · {formatNumber(cost)}
+      </button>
+      <button
+        onClick={() => buyWithGram(kind, id, cost, name)}
+        className="glass-thin flex items-center gap-1 rounded-xl px-3 py-2.5 text-xs transition-transform duration-200 active:scale-95"
+      >
+        <GramIcon size={13} /> {gramForCost(cost)}
+      </button>
+      <button
+        disabled={busy === `${id}-stars`}
+        onClick={() => buyWithStars(kind, id, cost, name, level)}
+        className="glass-thin flex items-center gap-1 rounded-xl px-3 py-2.5 text-xs transition-transform duration-200 active:scale-95 disabled:opacity-50"
+      >
+        {busy === `${id}-stars` ? (
+          <Loader2 size={13} className="animate-spin text-blue-400" />
+        ) : (
+          <Star size={13} className="fill-blue-400 text-blue-400" />
+        )}
+        {starsForCost(cost)}
+      </button>
+    </div>
+  );
+
   return (
-    <div className="space-y-3">
-      <section className="liquid-glass animate-fade-up delay-1 rounded-2xl p-5">
-        <p className="text-xs text-foreground/60">Current mining rate</p>
-        <p className="text-3xl tracking-tight">{formatNumber(ratePerHour(state))} / hr</p>
-        <p className="mt-1 text-[11px] text-foreground/60">
-          Every upgrade can be paid with MUSIC, GRAM or Telegram Stars.
-        </p>
-        <div className="mt-3 flex items-center gap-2 text-[11px]">
-          <span className="glass-thin flex items-center gap-1.5 rounded-lg px-2.5 py-1">
-            <GramIcon size={13} /> {formatCrypto(state.gram)} GRAM
+    <div className="space-y-5">
+      <section className="animate-fade-up delay-1 text-center">
+        <p className="text-xs text-foreground/50">Mining rate</p>
+        <p className="mt-1 text-4xl tracking-tight">{formatNumber(ratePerHour(state))}</p>
+        <p className="text-xs text-foreground/50">MUSIC / hour</p>
+        <div className="mt-3 flex items-center justify-center gap-2 text-[11px]">
+          <span className="glass-thin flex items-center gap-1.5 rounded-full px-3 py-1">
+            <GramIcon size={13} /> {formatCrypto(state.gram)}
           </span>
-          <span className="glass-thin flex items-center gap-1.5 rounded-lg px-2.5 py-1">
-            <Star size={12} className="text-blue-500" /> Stars checkout
+          <span className="glass-thin flex items-center gap-1.5 rounded-full px-3 py-1">
+            <Star size={11} className="fill-blue-400 text-blue-400" /> Stars
           </span>
         </div>
       </section>
 
-      {INSTRUMENTS.map((inst, idx) => {
-        const level = state.levels[inst.id] ?? 0;
-        const cost = upgradeCost(inst, level);
-        const current = instrumentRate(inst, level);
-        const next = instrumentRate(inst, level + 1);
-        const affordable = state.balance >= cost;
-        const Icon = ICONS[inst.icon] ?? AudioWaveform;
+      <section className="animate-fade-up delay-2 space-y-2">
+        <h2 className="px-1 text-xs uppercase tracking-widest text-foreground/40">Instruments</h2>
+        {INSTRUMENTS.map((inst) => {
+          const level = state.levels[inst.id] ?? 0;
+          const cost = upgradeCost(inst, level);
+          const current = instrumentRate(inst, level);
+          const next = instrumentRate(inst, level + 1);
+          const affordable = state.balance >= cost;
+          const Icon = ICONS[inst.icon] ?? AudioWaveform;
 
-        return (
-          <div
-            key={inst.id}
-            className={`liquid-glass animate-fade-up rounded-2xl p-4 ${idx < 4 ? `delay-${idx + 1}` : ""}`}
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-700">
-                <Icon size={20} strokeWidth={2} />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm">{inst.name}</p>
-                  <span className="glass-thin rounded-lg px-2 py-0.5 text-[11px]">Lv {level}</span>
+          return (
+            <div key={inst.id} className="liquid-glass rounded-2xl p-3.5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                  <Icon size={18} strokeWidth={1.8} />
                 </div>
-                <p className="text-[11px] text-foreground/60">{inst.desc}</p>
-                <p className="mt-1 text-[11px] text-foreground/80">
-                  {formatNumber(current)} / hr → {formatNumber(next)} / hr
-                </p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm">{inst.name}</p>
+                  <p className="text-[11px] text-foreground/50">
+                    {formatNumber(current)} → {formatNumber(next)} / hr
+                  </p>
+                </div>
+                <span className="glass-thin shrink-0 rounded-lg px-2 py-0.5 text-[11px] text-foreground/70">
+                  Lv {level}
+                </span>
               </div>
+
+              <PayRow
+                kind="instrument"
+                id={inst.id}
+                cost={cost}
+                name={inst.name}
+                level={level}
+                label="Upgrade"
+                affordable={affordable}
+                onMusic={() => {
+                  const ok = upgrade(inst.id);
+                  toast[ok ? "success" : "error"](
+                    ok ? `${inst.name} upgraded to level ${level + 1}` : "Not enough MUSIC",
+                  );
+                }}
+              />
             </div>
-
-            <button
-              onClick={() => {
-                const ok = upgrade(inst.id);
-                toast[ok ? "success" : "error"](
-                  ok ? `${inst.name} upgraded to level ${level + 1}` : "Not enough MUSIC",
-                );
-              }}
-              disabled={!affordable}
-              className={`mt-3 w-full rounded-xl py-2.5 text-sm transition-transform duration-200 active:scale-95 ${
-                affordable ? "bg-white text-gray-900 hover:scale-105" : "glass-thin text-foreground/50"
-              }`}
-            >
-              Upgrade · {formatNumber(cost)} MUSIC
-            </button>
-
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <button
-                onClick={() => buyWithGram("instrument", inst.id, cost, inst.name)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-blue-700 py-2 text-xs transition-transform duration-200 active:scale-95"
-              >
-                <GramIcon size={13} /> {gramForCost(cost)} GRAM
-              </button>
-              <button
-                disabled={busy === `${inst.id}-stars`}
-                onClick={() => buyWithStars("instrument", inst.id, cost, inst.name, level)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-white py-2 text-xs text-gray-900 transition-transform duration-200 active:scale-95 disabled:opacity-50"
-              >
-                {busy === `${inst.id}-stars` ? (
-                  <Loader2 size={13} className="animate-spin text-blue-700" />
-                ) : (
-                  <Star size={13} className="text-blue-700" />
-                )}
-                {starsForCost(cost)} Stars
-              </button>
-            </div>
-          </div>
-        );
-      })}
-
-      <section className="liquid-glass animate-fade-up rounded-2xl p-5">
-        <p className="text-sm">Crypto rigs</p>
-        <p className="mt-1 text-[11px] text-foreground/60">
-          Convert studio power into GRAM and USDT. Premium doubles every rig.
-        </p>
+          );
+        })}
       </section>
 
-      {MINERS.map((m) => {
-        const level = state.minerLevels[m.id] ?? 0;
-        const cost = minerUpgradeCost(m, level);
-        const affordable = state.balance >= cost;
-        const nextLevelState = {
-          ...state,
-          minerLevels: { ...state.minerLevels, [m.id]: level + 1 },
-        };
-        return (
-          <div key={m.id} className="liquid-glass animate-fade-up rounded-2xl p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                <CoinIcon id={m.id} size={26} />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm">{m.name}</p>
-                  <span className="glass-thin rounded-lg px-2 py-0.5 text-[11px]">Lv {level}</span>
+      <section className="animate-fade-up delay-3 space-y-2">
+        <h2 className="px-1 text-xs uppercase tracking-widest text-foreground/40">Crypto rigs</h2>
+        {MINERS.map((m) => {
+          const level = state.minerLevels[m.id] ?? 0;
+          const cost = minerUpgradeCost(m, level);
+          const affordable = state.balance >= cost;
+          const nextLevelState = {
+            ...state,
+            minerLevels: { ...state.minerLevels, [m.id]: level + 1 },
+          };
+          return (
+            <div key={m.id} className="liquid-glass rounded-2xl p-3.5">
+              <div className="flex items-center gap-3">
+                <CoinIcon id={m.id} size={40} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm">{m.name}</p>
+                  <p className="text-[11px] text-foreground/50">
+                    {formatCrypto(minerRate(state, m))} → {formatCrypto(minerRate(nextLevelState, m))}{" "}
+                    {m.symbol} / hr
+                  </p>
                 </div>
-                <p className="text-[11px] text-foreground/60">{m.desc}</p>
-                <p className="mt-1 text-[11px] text-foreground/80">
-                  {formatCrypto(minerRate(state, m))} → {formatCrypto(minerRate(nextLevelState, m))}{" "}
-                  {m.symbol} / hr
-                </p>
-                <p className="mt-0.5 text-[10px] text-foreground/50">
-                  Wallet {formatCrypto(m.id === "gram" ? state.gram : state.usdt)} {m.symbol} · min
-                  withdraw {m.minWithdraw} {m.symbol}
-                </p>
+                <span className="glass-thin shrink-0 rounded-lg px-2 py-0.5 text-[11px] text-foreground/70">
+                  Lv {level}
+                </span>
               </div>
-            </div>
 
-            <button
-              onClick={() => {
-                const ok = upgradeMiner(m.id);
-                toast[ok ? "success" : "error"](
-                  ok ? `${m.name} is now level ${level + 1}` : "Not enough MUSIC",
-                );
-              }}
-              disabled={!affordable}
-              className={`mt-3 w-full rounded-xl py-2.5 text-sm transition-transform duration-200 active:scale-95 ${
-                affordable ? "bg-white text-gray-900 hover:scale-105" : "glass-thin text-foreground/50"
-              }`}
-            >
-              {level === 0 ? "Unlock" : "Upgrade"} · {formatNumber(cost)} MUSIC
-            </button>
-
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <button
-                onClick={() => buyWithGram("miner", m.id, cost, m.name)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-blue-700 py-2 text-xs transition-transform duration-200 active:scale-95"
-              >
-                <GramIcon size={13} /> {gramForCost(cost)} GRAM
-              </button>
-              <button
-                disabled={busy === `${m.id}-stars`}
-                onClick={() => buyWithStars("miner", m.id, cost, m.name, level)}
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-white py-2 text-xs text-gray-900 transition-transform duration-200 active:scale-95 disabled:opacity-50"
-              >
-                {busy === `${m.id}-stars` ? (
-                  <Loader2 size={13} className="animate-spin text-blue-700" />
-                ) : (
-                  <Star size={13} className="text-blue-700" />
-                )}
-                {starsForCost(cost)} Stars
-              </button>
+              <PayRow
+                kind="miner"
+                id={m.id}
+                cost={cost}
+                name={m.name}
+                level={level}
+                label={level === 0 ? "Unlock" : "Upgrade"}
+                affordable={affordable}
+                onMusic={() => {
+                  const ok = upgradeMiner(m.id);
+                  toast[ok ? "success" : "error"](
+                    ok ? `${m.name} is now level ${level + 1}` : "Not enough MUSIC",
+                  );
+                }}
+              />
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </section>
     </div>
   );
 }
+
