@@ -1,10 +1,11 @@
 import { createFileRoute, ClientOnly } from "@tanstack/react-router";
 import { Suspense, lazy, useState } from "react";
-import { ArrowUpRight, LogOut, Plus } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { useGame } from "@/hooks/useGame";
-import { CoinIcon } from "@/components/CoinIcon";
+import { CoinIcon, MusicIcon } from "@/components/CoinIcon";
 import { MINERS, formatCrypto, formatNumber, minerRate } from "@/lib/game";
+import { makeMemo, openExternal, tonkeeperLink } from "@/lib/payments";
 
 export const Route = createFileRoute("/wallet")({
   head: () => ({
@@ -31,7 +32,6 @@ function short(a: string) {
 
 function WalletPage() {
   const { state, connectWallet, disconnectWallet, withdraw } = useGame();
-  const [manual, setManual] = useState(false);
   const [draft, setDraft] = useState("");
 
   const connected = Boolean(state.walletAddress);
@@ -44,27 +44,60 @@ function WalletPage() {
     }
     connectWallet(value);
     setDraft("");
-    setManual(false);
     toast.success("GRAM wallet connected");
+  };
+
+  const deposit = () => {
+    openExternal(tonkeeperLink(1, makeMemo("coins")));
+    toast("Deposit opened", { description: "Send GRAM from your wallet app." });
+  };
+
+  const quickWithdraw = () => {
+    const ready = MINERS.find((m) => (m.id === "gram" ? state.gram : state.usdt) >= m.minWithdraw);
+    if (!ready) {
+      toast.error("Nothing to withdraw yet", { description: "Mine more before withdrawing." });
+      return;
+    }
+    const ok = withdraw(ready.id);
+    toast[ok ? "success" : "error"](
+      ok ? `Withdrawal requested in ${ready.symbol}` : "Withdrawal failed",
+    );
   };
 
   return (
     <div className="space-y-6">
       <section className="animate-fade-up flex flex-col items-center pt-6 text-center">
-        <p className="text-xs text-foreground/50">Total balance</p>
-        <p className="mt-1 text-5xl tracking-tight">{formatNumber(state.balance)}</p>
+        <MusicIcon size={56} />
+        <p className="mt-3 text-5xl tracking-tight">{formatNumber(state.balance)}</p>
         <p className="mt-1 text-sm text-foreground/50">MUSIC</p>
 
         {connected ? (
-          <button
-            onClick={() => {
-              disconnectWallet();
-              toast("Wallet disconnected");
-            }}
-            className="glass-thin mt-4 flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] text-foreground/70"
-          >
-            {short(state.walletAddress!)} <LogOut size={12} strokeWidth={2} />
-          </button>
+          <>
+            <button
+              onClick={() => {
+                disconnectWallet();
+                toast("Wallet disconnected");
+              }}
+              className="glass-thin mt-3 flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] text-foreground/70"
+            >
+              {short(state.walletAddress!)} <LogOut size={12} strokeWidth={2} />
+            </button>
+
+            <div className="mt-5 grid w-full grid-cols-2 gap-2">
+              <button
+                onClick={deposit}
+                className="flex items-center justify-center gap-2 rounded-2xl bg-white py-3 text-sm text-gray-900 transition-transform duration-200 active:scale-95"
+              >
+                <ArrowDownLeft size={16} strokeWidth={2} /> Deposit
+              </button>
+              <button
+                onClick={quickWithdraw}
+                className="glass-thin flex items-center justify-center gap-2 rounded-2xl py-3 text-sm transition-transform duration-200 active:scale-95"
+              >
+                <ArrowUpRight size={16} strokeWidth={2} /> Withdraw
+              </button>
+            </div>
+          </>
         ) : null}
       </section>
 
@@ -75,33 +108,33 @@ function WalletPage() {
               <TonWallet />
             </Suspense>
           </ClientOnly>
-          {manual ? (
-            <div className="space-y-2">
-              <input
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                placeholder="UQ… paste your wallet address"
-                className="glass-thin w-full rounded-xl px-3 py-3 text-xs outline-none placeholder:text-foreground/40"
-              />
-              <button
-                onClick={submit}
-                className="w-full rounded-xl bg-white py-3 text-sm text-gray-900 transition-transform duration-200 active:scale-95"
-              >
-                Connect wallet
-              </button>
-            </div>
-          ) : (
+          <div className="space-y-2">
+            <input
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              placeholder="UQ… paste your wallet address"
+              className="glass-thin w-full rounded-xl px-3 py-3 text-xs outline-none placeholder:text-foreground/40"
+            />
             <button
-              onClick={() => setManual(true)}
-              className="flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-[11px] text-foreground/50"
+              onClick={submit}
+              className="w-full rounded-xl bg-white py-3 text-sm text-gray-900 transition-transform duration-200 active:scale-95"
             >
-              <Plus size={12} strokeWidth={2} /> Enter address manually
+              Connect wallet
             </button>
-          )}
+          </div>
         </section>
       )}
 
       <section className="animate-fade-up delay-2 space-y-2">
+        <div className="liquid-glass flex items-center gap-3 rounded-2xl p-4">
+          <MusicIcon size={40} />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm">MUSIC</p>
+            <p className="text-[11px] text-foreground/50">Our in-app coin</p>
+          </div>
+          <p className="text-base tracking-tight">{formatNumber(state.balance)}</p>
+        </div>
+
         {MINERS.map((m) => {
           const balance = m.id === "gram" ? state.gram : state.usdt;
           const canWithdraw = connected && balance >= m.minWithdraw;
