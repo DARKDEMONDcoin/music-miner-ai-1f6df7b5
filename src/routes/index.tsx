@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { BarChart3, DollarSign, Gem, Heart, Sparkles, Zap } from "lucide-react";
+import { BarChart3, Heart, Sparkles, Zap } from "lucide-react";
+import { CoinIcon } from "@/components/CoinIcon";
 import { toast } from "sonner";
 import { useGame } from "@/hooks/useGame";
 import {
@@ -124,9 +125,9 @@ function MinePage() {
 
       <section className="animate-fade-up delay-3 grid grid-cols-2 gap-3">
         {[
-          { m: gramMiner, icon: Gem, balance: state.gram, ready: gramReady },
-          { m: usdtMiner, icon: DollarSign, balance: state.usdt, ready: usdtReady },
-        ].map(({ m, icon: Icon, balance, ready: pend }) => {
+          { m: gramMiner, balance: state.gram, ready: gramReady },
+          { m: usdtMiner, balance: state.usdt, ready: usdtReady },
+        ].map(({ m, balance, ready: pend }) => {
           const level = state.minerLevels[m.id] ?? 0;
           return (
             <Link
@@ -135,8 +136,8 @@ function MinePage() {
               className="liquid-glass rounded-2xl p-4 transition-transform duration-200 active:scale-95"
             >
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-700">
-                  <Icon size={15} strokeWidth={2} />
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
+                  <CoinIcon id={m.id} size={20} />
                 </div>
                 <span className="text-xs text-foreground/70">{m.symbol}</span>
               </div>

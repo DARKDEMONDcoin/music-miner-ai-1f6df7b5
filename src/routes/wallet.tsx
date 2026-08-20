@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, ClientOnly } from "@tanstack/react-router";
+import { Suspense, lazy, useState } from "react";
 import { ArrowUpRight, Link2, LogOut, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { useGame } from "@/hooks/useGame";
@@ -23,6 +23,8 @@ export const Route = createFileRoute("/wallet")({
 });
 
 const ADDRESS_RE = /^[UEuе][QqFf][A-Za-z0-9_-]{46}$/;
+
+const TonWallet = lazy(() => import("@/components/TonWallet"));
 
 function WalletPage() {
   const { state, connectWallet, disconnectWallet, withdraw } = useGame();
@@ -68,6 +70,14 @@ function WalletPage() {
           </button>
         ) : (
           <div className="mt-3 space-y-2">
+            <ClientOnly fallback={<div className="h-10" aria-hidden />}>
+              <Suspense fallback={<div className="h-10" aria-hidden />}>
+                <TonWallet />
+              </Suspense>
+            </ClientOnly>
+            <p className="text-center text-[10px] text-foreground/50">
+              Connect Tonkeeper, MyTonWallet or any GRAM wallet — or paste an address manually
+            </p>
             <button
               onClick={() => openExternal("https://app.tonkeeper.com/")}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-2.5 text-sm transition-transform duration-200 hover:scale-105 active:scale-95"

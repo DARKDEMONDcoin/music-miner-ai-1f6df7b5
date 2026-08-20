@@ -3,7 +3,8 @@ import { Pickaxe, SlidersHorizontal, Sparkles, ListChecks, Wallet } from "lucide
 import type { ReactNode } from "react";
 import { useGame } from "@/hooks/useGame";
 import { BoomerangVideoBg } from "@/components/BoomerangVideoBg";
-import { formatNumber, isPremium } from "@/lib/game";
+import { formatCrypto, formatNumber, isPremium } from "@/lib/game";
+import { GramIcon, UsdtIcon } from "@/components/CoinIcon";
 
 const NAV = [
   { to: "/", label: "Mine", icon: Pickaxe },
@@ -36,13 +37,19 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Logo />
               <span className="text-base tracking-tight">music ai</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {isPremium(state) && (
                 <span className="rounded-lg bg-blue-700 px-2 py-1 text-[10px] tracking-tight">
                   Premium
                 </span>
               )}
-              <span className="rounded-xl bg-white px-3 py-1 text-sm text-gray-900">
+              <span className="glass-thin flex items-center gap-1 rounded-lg px-2 py-1 text-[11px]">
+                <GramIcon size={12} /> {formatCrypto(state.gram)}
+              </span>
+              <span className="glass-thin flex items-center gap-1 rounded-lg px-2 py-1 text-[11px]">
+                <UsdtIcon size={12} /> {formatCrypto(state.usdt)}
+              </span>
+              <span className="rounded-xl bg-white px-2.5 py-1 text-sm text-gray-900">
                 {formatNumber(state.balance)}
               </span>
             </div>

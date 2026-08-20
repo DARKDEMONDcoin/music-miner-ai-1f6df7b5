@@ -146,6 +146,14 @@ function UpgradesTab() {
         <p className="mt-1 text-[11px] text-foreground/60">
           Every upgrade can be paid with MUSIC, GRAM or Telegram Stars.
         </p>
+        <div className="mt-3 flex items-center gap-2 text-[11px]">
+          <span className="glass-thin flex items-center gap-1.5 rounded-lg px-2.5 py-1">
+            <GramIcon size={13} /> {formatCrypto(state.gram)} GRAM
+          </span>
+          <span className="glass-thin flex items-center gap-1.5 rounded-lg px-2.5 py-1">
+            <Star size={12} className="text-blue-500" /> Stars checkout
+          </span>
+        </div>
       </section>
 
       {INSTRUMENTS.map((inst, idx) => {
