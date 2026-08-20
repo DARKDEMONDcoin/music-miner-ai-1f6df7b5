@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useGame } from "@/hooks/useGame";
-import { GramIcon, CoinIcon } from "@/components/CoinIcon";
+import { GramIcon, CoinIcon, MusicIcon } from "@/components/CoinIcon";
 import { StorePanel } from "@/components/StorePanel";
 import { openExternal, telegram } from "@/lib/payments";
 import {
@@ -59,14 +59,14 @@ function StudioPage() {
   const [tab, setTab] = useState<"upgrades" | "store">("upgrades");
 
   return (
-    <div className="space-y-3">
-      <div className="liquid-glass animate-fade-up grid grid-cols-2 gap-1 rounded-2xl p-1.5">
+    <div className="space-y-4 pt-4">
+      <div className="glass-thin animate-fade-up mx-auto flex w-full max-w-xs rounded-full p-1">
         {(["upgrades", "store"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`rounded-xl py-2 text-xs capitalize transition-transform duration-200 active:scale-95 ${
-              tab === t ? "bg-white text-gray-900" : "text-foreground/70"
+            className={`flex-1 rounded-full py-2 text-xs capitalize transition-all duration-200 active:scale-95 ${
+              tab === t ? "bg-white text-gray-900 shadow-lg" : "text-foreground/60"
             }`}
           >
             {t}
@@ -138,165 +138,169 @@ function UpgradesTab() {
     }
   };
 
-  const PayRow = ({
+  const UpgradeCard = ({
     kind,
     id,
-    cost,
     name,
+    cost,
     level,
     label,
-    affordable,
+    from,
+    to,
+    unit,
+    icon,
     onMusic,
   }: {
     kind: "instrument" | "miner";
     id: string;
-    cost: number;
     name: string;
+    cost: number;
     level: number;
     label: string;
-    affordable: boolean;
+    from: string;
+    to: string;
+    unit: string;
+    icon: React.ReactNode;
     onMusic: () => void;
-  }) => (
-    <div className="mt-3 flex items-center gap-1.5">
-      <button
-        onClick={onMusic}
-        disabled={!affordable}
-        className={`flex-1 rounded-xl py-2.5 text-xs transition-transform duration-200 active:scale-95 ${
-          affordable ? "bg-white text-gray-900" : "glass-thin text-foreground/40"
-        }`}
-      >
-        {label} · {formatNumber(cost)}
-      </button>
-      <button
-        onClick={() => buyWithGram(kind, id, cost, name)}
-        className="glass-thin flex items-center gap-1 rounded-xl px-3 py-2.5 text-xs transition-transform duration-200 active:scale-95"
-      >
-        <GramIcon size={13} /> {gramForCost(cost)}
-      </button>
-      <button
-        disabled={busy === `${id}-stars`}
-        onClick={() => buyWithStars(kind, id, cost, name, level)}
-        className="glass-thin flex items-center gap-1 rounded-xl px-3 py-2.5 text-xs transition-transform duration-200 active:scale-95 disabled:opacity-50"
-      >
-        {busy === `${id}-stars` ? (
-          <Loader2 size={13} className="animate-spin text-blue-400" />
-        ) : (
-          <Star size={13} className="fill-blue-400 text-blue-400" />
-        )}
-        {starsForCost(cost)}
-      </button>
-    </div>
-  );
+  }) => {
+    const affordable = state.balance >= cost;
+    return (
+      <div className="liquid-glass overflow-hidden rounded-3xl">
+        <div className="flex items-center gap-3 p-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10">
+            {icon}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <p className="truncate text-sm">{name}</p>
+              <span className="glass-thin shrink-0 rounded-md px-1.5 py-0.5 text-[10px] text-foreground/60">
+                Lv {level}
+              </span>
+            </div>
+            <p className="mt-0.5 text-[11px] text-foreground/50">
+              {from} <span className="text-foreground/30">→</span>{" "}
+              <span className="text-foreground/80">{to}</span> {unit}
+            </p>
+          </div>
+        </div>
+
+        <div className="border-t border-white/10 p-2.5">
+          <button
+            onClick={onMusic}
+            disabled={!affordable}
+            className={`flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-sm transition-transform duration-200 active:scale-95 ${
+              affordable ? "bg-white text-gray-900" : "glass-thin text-foreground/40"
+            }`}
+          >
+            <MusicIcon size={16} /> {label} · {formatNumber(cost)}
+          </button>
+
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <button
+              onClick={() => buyWithGram(kind, id, cost, name)}
+              className="glass-thin flex items-center justify-center gap-1.5 rounded-2xl py-2.5 text-xs transition-transform duration-200 active:scale-95"
+            >
+              <GramIcon size={14} /> {gramForCost(cost)} GRAM
+            </button>
+            <button
+              disabled={busy === `${id}-stars`}
+              onClick={() => buyWithStars(kind, id, cost, name, level)}
+              className="glass-thin flex items-center justify-center gap-1.5 rounded-2xl py-2.5 text-xs transition-transform duration-200 active:scale-95 disabled:opacity-50"
+            >
+              {busy === `${id}-stars` ? (
+                <Loader2 size={14} className="animate-spin text-blue-400" />
+              ) : (
+                <Star size={14} className="fill-blue-400 text-blue-400" />
+              )}
+              {starsForCost(cost)} Stars
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-5">
-      <section className="animate-fade-up delay-1 text-center">
-        <p className="text-xs text-foreground/50">Mining rate</p>
+      <section className="liquid-glass animate-fade-up delay-1 rounded-3xl p-5 text-center">
+        <p className="text-[11px] uppercase tracking-widest text-foreground/40">Mining rate</p>
         <p className="mt-1 text-4xl tracking-tight">{formatNumber(ratePerHour(state))}</p>
         <p className="text-xs text-foreground/50">MUSIC / hour</p>
-        <div className="mt-3 flex items-center justify-center gap-2 text-[11px]">
-          <span className="glass-thin flex items-center gap-1.5 rounded-full px-3 py-1">
-            <GramIcon size={13} /> {formatCrypto(state.gram)}
+        <div className="mt-4 grid grid-cols-3 gap-2 text-[11px]">
+          <span className="glass-thin flex items-center justify-center gap-1.5 rounded-xl py-2">
+            <MusicIcon size={14} /> {formatNumber(state.balance)}
           </span>
-          <span className="glass-thin flex items-center gap-1.5 rounded-full px-3 py-1">
-            <Star size={11} className="fill-blue-400 text-blue-400" /> Stars
+          <span className="glass-thin flex items-center justify-center gap-1.5 rounded-xl py-2">
+            <GramIcon size={14} /> {formatCrypto(state.gram)}
+          </span>
+          <span className="glass-thin flex items-center justify-center gap-1.5 rounded-xl py-2">
+            <CoinIcon id="usdt" size={14} /> {formatCrypto(state.usdt)}
           </span>
         </div>
       </section>
 
-      <section className="animate-fade-up delay-2 space-y-2">
+      <section className="animate-fade-up delay-2 space-y-2.5">
         <h2 className="px-1 text-xs uppercase tracking-widest text-foreground/40">Instruments</h2>
         {INSTRUMENTS.map((inst) => {
           const level = state.levels[inst.id] ?? 0;
           const cost = upgradeCost(inst, level);
-          const current = instrumentRate(inst, level);
-          const next = instrumentRate(inst, level + 1);
-          const affordable = state.balance >= cost;
           const Icon = ICONS[inst.icon] ?? AudioWaveform;
-
           return (
-            <div key={inst.id} className="liquid-glass rounded-2xl p-3.5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                  <Icon size={18} strokeWidth={1.8} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm">{inst.name}</p>
-                  <p className="text-[11px] text-foreground/50">
-                    {formatNumber(current)} → {formatNumber(next)} / hr
-                  </p>
-                </div>
-                <span className="glass-thin shrink-0 rounded-lg px-2 py-0.5 text-[11px] text-foreground/70">
-                  Lv {level}
-                </span>
-              </div>
-
-              <PayRow
-                kind="instrument"
-                id={inst.id}
-                cost={cost}
-                name={inst.name}
-                level={level}
-                label="Upgrade"
-                affordable={affordable}
-                onMusic={() => {
-                  const ok = upgrade(inst.id);
-                  toast[ok ? "success" : "error"](
-                    ok ? `${inst.name} upgraded to level ${level + 1}` : "Not enough MUSIC",
-                  );
-                }}
-              />
-            </div>
+            <UpgradeCard
+              key={inst.id}
+              kind="instrument"
+              id={inst.id}
+              name={inst.name}
+              cost={cost}
+              level={level}
+              label="Upgrade"
+              from={formatNumber(instrumentRate(inst, level))}
+              to={formatNumber(instrumentRate(inst, level + 1))}
+              unit="MUSIC / hr"
+              icon={<Icon size={20} strokeWidth={1.8} />}
+              onMusic={() => {
+                const ok = upgrade(inst.id);
+                toast[ok ? "success" : "error"](
+                  ok ? `${inst.name} upgraded to level ${level + 1}` : "Not enough MUSIC",
+                );
+              }}
+            />
           );
         })}
       </section>
 
-      <section className="animate-fade-up delay-3 space-y-2">
+      <section className="animate-fade-up delay-3 space-y-2.5">
         <h2 className="px-1 text-xs uppercase tracking-widest text-foreground/40">Crypto rigs</h2>
         {MINERS.map((m) => {
           const level = state.minerLevels[m.id] ?? 0;
           const cost = minerUpgradeCost(m, level);
-          const affordable = state.balance >= cost;
           const nextLevelState = {
             ...state,
             minerLevels: { ...state.minerLevels, [m.id]: level + 1 },
           };
           return (
-            <div key={m.id} className="liquid-glass rounded-2xl p-3.5">
-              <div className="flex items-center gap-3">
-                <CoinIcon id={m.id} size={40} />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm">{m.name}</p>
-                  <p className="text-[11px] text-foreground/50">
-                    {formatCrypto(minerRate(state, m))} → {formatCrypto(minerRate(nextLevelState, m))}{" "}
-                    {m.symbol} / hr
-                  </p>
-                </div>
-                <span className="glass-thin shrink-0 rounded-lg px-2 py-0.5 text-[11px] text-foreground/70">
-                  Lv {level}
-                </span>
-              </div>
-
-              <PayRow
-                kind="miner"
-                id={m.id}
-                cost={cost}
-                name={m.name}
-                level={level}
-                label={level === 0 ? "Unlock" : "Upgrade"}
-                affordable={affordable}
-                onMusic={() => {
-                  const ok = upgradeMiner(m.id);
-                  toast[ok ? "success" : "error"](
-                    ok ? `${m.name} is now level ${level + 1}` : "Not enough MUSIC",
-                  );
-                }}
-              />
-            </div>
+            <UpgradeCard
+              key={m.id}
+              kind="miner"
+              id={m.id}
+              name={m.name}
+              cost={cost}
+              level={level}
+              label={level === 0 ? "Unlock" : "Upgrade"}
+              from={formatCrypto(minerRate(state, m))}
+              to={formatCrypto(minerRate(nextLevelState, m))}
+              unit={`${m.symbol} / hr`}
+              icon={<CoinIcon id={m.id} size={36} />}
+              onMusic={() => {
+                const ok = upgradeMiner(m.id);
+                toast[ok ? "success" : "error"](
+                  ok ? `${m.name} is now level ${level + 1}` : "Not enough MUSIC",
+                );
+              }}
+            />
           );
         })}
       </section>
     </div>
   );
 }
-
