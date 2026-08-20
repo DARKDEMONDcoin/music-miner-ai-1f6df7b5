@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, ClientOnly } from "@tanstack/react-router";
+import { Suspense, lazy, useState } from "react";
 import { ArrowUpRight, Link2, LogOut, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { useGame } from "@/hooks/useGame";
