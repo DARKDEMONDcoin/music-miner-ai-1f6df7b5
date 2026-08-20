@@ -16,6 +16,7 @@ import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as ApiAiComposeRouteImport } from './routes/api/ai/compose'
 import { Route as ApiAiCoverRouteImport } from './routes/api/ai/cover'
+import { Route as ApiPublicTonconnectManifestRouteImport } from './routes/api/public/tonconnect-manifest'
 import { Route as ApiTelegramInvoiceRouteImport } from './routes/api/telegram/invoice'
 import { Route as ApiPublicTelegramCronRouteImport } from './routes/api/public/telegram/cron'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
@@ -55,6 +56,12 @@ const ApiAiCoverRoute = ApiAiCoverRouteImport.update({
   path: '/api/ai/cover',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTonconnectManifestRoute =
+  ApiPublicTonconnectManifestRouteImport.update({
+    id: '/api/public/tonconnect-manifest',
+    path: '/api/public/tonconnect-manifest',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiTelegramInvoiceRoute = ApiTelegramInvoiceRouteImport.update({
   id: '/api/telegram/invoice',
   path: '/api/telegram/invoice',
@@ -80,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/wallet': typeof WalletRoute
   '/api/ai/compose': typeof ApiAiComposeRoute
   '/api/ai/cover': typeof ApiAiCoverRoute
+  '/api/public/tonconnect-manifest': typeof ApiPublicTonconnectManifestRoute
   '/api/telegram/invoice': typeof ApiTelegramInvoiceRoute
   '/api/public/telegram/cron': typeof ApiPublicTelegramCronRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -92,6 +100,7 @@ export interface FileRoutesByTo {
   '/wallet': typeof WalletRoute
   '/api/ai/compose': typeof ApiAiComposeRoute
   '/api/ai/cover': typeof ApiAiCoverRoute
+  '/api/public/tonconnect-manifest': typeof ApiPublicTonconnectManifestRoute
   '/api/telegram/invoice': typeof ApiTelegramInvoiceRoute
   '/api/public/telegram/cron': typeof ApiPublicTelegramCronRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -105,6 +114,7 @@ export interface FileRoutesById {
   '/wallet': typeof WalletRoute
   '/api/ai/compose': typeof ApiAiComposeRoute
   '/api/ai/cover': typeof ApiAiCoverRoute
+  '/api/public/tonconnect-manifest': typeof ApiPublicTonconnectManifestRoute
   '/api/telegram/invoice': typeof ApiTelegramInvoiceRoute
   '/api/public/telegram/cron': typeof ApiPublicTelegramCronRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/api/ai/compose'
     | '/api/ai/cover'
+    | '/api/public/tonconnect-manifest'
     | '/api/telegram/invoice'
     | '/api/public/telegram/cron'
     | '/api/public/telegram/webhook'
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/api/ai/compose'
     | '/api/ai/cover'
+    | '/api/public/tonconnect-manifest'
     | '/api/telegram/invoice'
     | '/api/public/telegram/cron'
     | '/api/public/telegram/webhook'
@@ -143,6 +155,7 @@ export interface FileRouteTypes {
     | '/wallet'
     | '/api/ai/compose'
     | '/api/ai/cover'
+    | '/api/public/tonconnect-manifest'
     | '/api/telegram/invoice'
     | '/api/public/telegram/cron'
     | '/api/public/telegram/webhook'
@@ -156,6 +169,7 @@ export interface RootRouteChildren {
   WalletRoute: typeof WalletRoute
   ApiAiComposeRoute: typeof ApiAiComposeRoute
   ApiAiCoverRoute: typeof ApiAiCoverRoute
+  ApiPublicTonconnectManifestRoute: typeof ApiPublicTonconnectManifestRoute
   ApiTelegramInvoiceRoute: typeof ApiTelegramInvoiceRoute
   ApiPublicTelegramCronRoute: typeof ApiPublicTelegramCronRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
@@ -212,6 +226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAiCoverRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/tonconnect-manifest': {
+      id: '/api/public/tonconnect-manifest'
+      path: '/api/public/tonconnect-manifest'
+      fullPath: '/api/public/tonconnect-manifest'
+      preLoaderRoute: typeof ApiPublicTonconnectManifestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/telegram/invoice': {
       id: '/api/telegram/invoice'
       path: '/api/telegram/invoice'
@@ -244,6 +265,7 @@ const rootRouteChildren: RootRouteChildren = {
   WalletRoute: WalletRoute,
   ApiAiComposeRoute: ApiAiComposeRoute,
   ApiAiCoverRoute: ApiAiCoverRoute,
+  ApiPublicTonconnectManifestRoute: ApiPublicTonconnectManifestRoute,
   ApiTelegramInvoiceRoute: ApiTelegramInvoiceRoute,
   ApiPublicTelegramCronRoute: ApiPublicTelegramCronRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
