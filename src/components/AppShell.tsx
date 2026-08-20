@@ -3,7 +3,8 @@ import { Pickaxe, SlidersHorizontal, Sparkles, ListChecks, Wallet } from "lucide
 import type { ReactNode } from "react";
 import { useGame } from "@/hooks/useGame";
 import { BoomerangVideoBg } from "@/components/BoomerangVideoBg";
-import { formatNumber, isPremium } from "@/lib/game";
+import { formatCrypto, formatNumber, isPremium } from "@/lib/game";
+import { GramIcon, UsdtIcon } from "@/components/CoinIcon";
 
 const NAV = [
   { to: "/", label: "Mine", icon: Pickaxe },
