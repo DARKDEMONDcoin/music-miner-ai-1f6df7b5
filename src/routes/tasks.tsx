@@ -119,13 +119,14 @@ function TasksTab() {
                     claimTask(t.id, t.reward);
                     toast.success(`Claimed ${formatNumber(t.reward)} MUSIC`);
                   }}
-                  className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs transition-transform duration-200 active:scale-95 ${
+                  className={`flex w-full items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs transition-transform duration-200 active:scale-95 ${
                     done ? "glass-thin text-foreground/50" : "bg-white text-gray-900 hover:scale-105"
                   }`}
                 >
                   {done ? <Check size={13} strokeWidth={2} /> : null}
                   {done ? "Done" : (t.cta ?? "Claim")}
                 </button>
+                </div>
               </div>
             );
           })}
