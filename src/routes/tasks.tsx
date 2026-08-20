@@ -93,19 +93,25 @@ function TasksTab() {
           {TASKS.filter((t) => t.kind === g.kind).map((t) => {
             const done = state.claimedTasks.includes(t.id);
             return (
-              <div key={t.id} className="liquid-glass flex items-center gap-3 rounded-2xl p-3">
-                <img
-                  src={TASK_IMAGES[t.id] ?? dailyCheckin}
-                  alt={t.title}
-                  width={512}
-                  height={512}
-                  loading="lazy"
-                  className="h-12 w-12 shrink-0 rounded-xl object-cover"
-                />
-                <div className="flex-1">
-                  <p className="text-sm">{t.title}</p>
-                  <p className="text-[11px] text-foreground/60">+{formatNumber(t.reward)} MUSIC</p>
+              <div key={t.id} className="liquid-glass overflow-hidden rounded-2xl">
+                <div className="relative h-28 w-full">
+                  <img
+                    src={TASK_IMAGES[t.id] ?? dailyCheckin}
+                    alt={t.title}
+                    width={512}
+                    height={512}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute bottom-2 left-3 right-3">
+                    <p className="text-sm">{t.title}</p>
+                    <p className="text-[11px] text-foreground/70">
+                      +{formatNumber(t.reward)} MUSIC
+                    </p>
+                  </div>
                 </div>
+                <div className="p-3">
                 <button
                   disabled={done}
                   onClick={() => {
