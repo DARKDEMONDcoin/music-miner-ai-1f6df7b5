@@ -24,6 +24,8 @@ export const Route = createFileRoute("/wallet")({
 
 const ADDRESS_RE = /^[UEuе][QqFf][A-Za-z0-9_-]{46}$/;
 
+const TonWallet = lazy(() => import("@/components/TonWallet"));
+
 function WalletPage() {
   const { state, connectWallet, disconnectWallet, withdraw } = useGame();
   const [draft, setDraft] = useState("");
