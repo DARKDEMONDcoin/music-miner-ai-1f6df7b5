@@ -93,25 +93,19 @@ function TasksTab() {
           {TASKS.filter((t) => t.kind === g.kind).map((t) => {
             const done = state.claimedTasks.includes(t.id);
             return (
-              <div key={t.id} className="liquid-glass overflow-hidden rounded-2xl">
-                <div className="relative h-28 w-full">
-                  <img
-                    src={TASK_IMAGES[t.id] ?? dailyCheckin}
-                    alt={t.title}
-                    width={512}
-                    height={512}
-                    loading="lazy"
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute bottom-2 left-3 right-3">
-                    <p className="text-sm">{t.title}</p>
-                    <p className="text-[11px] text-foreground/70">
-                      +{formatNumber(t.reward)} MUSIC
-                    </p>
-                  </div>
+              <div key={t.id} className="liquid-glass flex items-center gap-3 rounded-2xl p-3">
+                <img
+                  src={TASK_IMAGES[t.id] ?? dailyCheckin}
+                  alt={t.title}
+                  width={112}
+                  height={112}
+                  loading="lazy"
+                  className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm">{t.title}</p>
+                  <p className="text-[11px] text-foreground/60">+{formatNumber(t.reward)} MUSIC</p>
                 </div>
-                <div className="p-3">
                 <button
                   disabled={done}
                   onClick={() => {
@@ -119,15 +113,15 @@ function TasksTab() {
                     claimTask(t.id, t.reward);
                     toast.success(`Claimed ${formatNumber(t.reward)} MUSIC`);
                   }}
-                  className={`flex w-full items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs transition-transform duration-200 active:scale-95 ${
-                    done ? "glass-thin text-foreground/50" : "bg-white text-gray-900 hover:scale-105"
+                  className={`flex shrink-0 items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs transition-transform duration-200 active:scale-95 ${
+                    done ? "glass-thin text-foreground/50" : "bg-white text-gray-900"
                   }`}
                 >
                   {done ? <Check size={13} strokeWidth={2} /> : null}
                   {done ? "Done" : (t.cta ?? "Claim")}
                 </button>
-                </div>
               </div>
+
             );
           })}
         </section>
